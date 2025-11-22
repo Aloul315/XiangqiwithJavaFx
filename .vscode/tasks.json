@@ -1,0 +1,49 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "gradle: sync-javafx",
+      "type": "shell",
+      "command": "${workspaceFolder}\\gradlew.bat",
+      "args": [
+        "syncJavafxLibs"
+      ],
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "gradle: run",
+      "type": "shell",
+      "command": "${workspaceFolder}\\gradlew.bat",
+      "args": [
+        "run"
+      ],
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "gradle: run --debug-jvm",
+      "type": "shell",
+      "command": "${workspaceFolder}\\gradlew.bat",
+      "args": [
+        "run",
+        "--debug-jvm"
+      ],
+      "isBackground": true,
+      "problemMatcher": [
+        "$java-jpda"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    }
+  ]
+}

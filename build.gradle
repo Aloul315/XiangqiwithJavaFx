@@ -1,0 +1,54 @@
+plugins {
+    id 'application'
+    id 'org.openjfx.javafxplugin' version '0.1.0'
+}
+
+repositories {
+    mavenCentral()
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+ext {
+    javafxVersion = '21.0.1'
+    def os = org.gradle.internal.os.OperatingSystem.current()
+    javafxPlatform = os.isWindows() ? 'win' : (os.isMacOsX() ? 'mac' : 'linux')
+}
+
+dependencies {
+    implementation "org.openjfx:javafx-controls:${javafxVersion}:${javafxPlatform}"
+    implementation 'org.xerial:sqlite-jdbc:3.45.2.0'
+    testImplementation platform('org.junit:junit-bom:5.11.3')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+javafx {
+    version = javafxVersion
+    modules = ['javafx.controls']
+}
+
+application {
+    mainClass = 'org.example.XiangqiApp'
+}
+
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
+}
+
+tasks.register('syncJavafxLibs', Sync) {
+    from {
+        configurations.runtimeClasspath.filter { file ->
+            file.name.startsWith('javafx') && file.name.endsWith('.jar')
+        }
+    }
+    into layout.buildDirectory.dir('javafx')
+}
+
+tasks.named('run').configure {
+    dependsOn(tasks.named('syncJavafxLibs'))
+}

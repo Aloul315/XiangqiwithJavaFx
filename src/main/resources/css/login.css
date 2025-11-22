@@ -1,0 +1,75 @@
+/* 
+ * 登录界面样式表 
+ * 定义了账号下拉框、输入框等组件的视觉风格
+ */
+
+/* 账号下拉框容器样式 */
+.account-combo {
+    -fx-background-color: rgba(15,23,42,0.06); /* 浅色背景 */
+    -fx-background-radius: 16; /* 圆角 */
+    -fx-border-radius: 16;
+    -fx-border-color: rgba(37,99,235,0.25); /* 蓝色边框，带透明度 */
+    -fx-border-width: 1;
+    -fx-padding: 0;
+}
+
+/* 账号下拉框获得焦点时的样式 */
+.account-combo:focused, .account-combo:contains-focus {
+    -fx-border-color: #2563eb; /* 深蓝色边框 */
+    -fx-background-color: rgba(255,255,255,0.95); /* 白色背景 */
+}
+
+/* 账号下拉框内部文本输入区域样式 */
+.account-combo .text-field {
+    -fx-background-color: transparent;
+    -fx-background-radius: 16 0 0 16; /* 左侧圆角 */
+    -fx-background-insets: 0;
+    -fx-padding: 10 0 10 14;
+    -fx-font-size: 14px;
+    -fx-text-fill: #1f2937; /* 深灰色文字 */
+    -fx-prompt-text-fill: #94a3b8; /* 提示文字颜色 */
+}
+
+/* 账号下拉框箭头按钮区域样式 */
+.account-combo .arrow-button {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0 16 16 0; /* 右侧圆角 */
+    -fx-background-insets: 0;
+    -fx-padding: 0 14 0 10;
+    -fx-cursor: hand; /* 手型光标 */
+}
+
+/* 账号下拉框箭头图标样式 */
+.account-combo .arrow {
+    -fx-background-color: #64748b; /* 灰色箭头 */
+    -fx-shape: "M 0 0 L 4 4 L 8 0"; /* 向下箭头形状 */
+    -fx-scale-shape: true;
+    -fx-min-width: 10px;
+    -fx-min-height: 6px;
+    -fx-max-width: 10px;
+    -fx-max-height: 6px;
+}
+
+/* 鼠标悬停在箭头按钮上时的箭头样式 */
+.account-combo .arrow-button:hover .arrow {
+    -fx-background-color: #2563eb; /* 蓝色箭头 */
+}
+
+/* 通用登录输入框样式（密码框等） */
+.login-field {
+    -fx-background-color: rgba(15,23,42,0.06);
+    -fx-background-radius: 16;
+    -fx-border-radius: 16;
+    -fx-border-color: rgba(37,99,235,0.25);
+    -fx-border-width: 1;
+    -fx-padding: 10 14 10 14;
+    -fx-font-size: 14px;
+    -fx-text-fill: #1f2937;
+    -fx-prompt-text-fill: #94a3b8;
+}
+
+/* 登录输入框获得焦点时的样式 */
+.login-field:focused {
+    -fx-border-color: #2563eb;
+    -fx-background-color: rgba(255,255,255,0.95);
+}

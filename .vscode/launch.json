@@ -1,0 +1,23 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "request": "launch",
+            "name": "Launch XiangqiApp (JavaFX)",
+            "mainClass": "org.example.XiangqiApp",
+            "projectName": "XiangqiwithJavaFX",
+            "console": "integratedTerminal",
+            "preLaunchTask": "gradle: sync-javafx",
+            "vmArgs": "--module-path \"${workspaceFolder}\\build\\javafx\" --add-modules javafx.controls"
+        },
+        {
+            "type": "java",
+            "request": "attach",
+            "name": "Debug XiangqiApp (JavaFX)",
+            "hostName": "localhost",
+            "port": 5005,
+            "preLaunchTask": "gradle: run --debug-jvm"
+        }
+    ]
+}
