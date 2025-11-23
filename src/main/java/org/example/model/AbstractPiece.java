@@ -8,7 +8,7 @@ import javafx.beans.property.SimpleIntegerProperty;
  * 包含棋子的基本属性（名称、阵营、位置）以及移动逻辑的抽象定义。
  * 使用 JavaFX 属性以支持 UI 绑定。
  */
-public abstract class AbstractPiece {
+public abstract class AbstractPiece implements Cloneable {
     private final String name;
     private final boolean red;
     private final IntegerProperty row;
@@ -135,4 +135,13 @@ public abstract class AbstractPiece {
      * @return 如果移动合法返回 true，否则返回 false
      */
     public abstract boolean canMoveTo(int targetRow, int targetCol, ChessBoardModel model);
+
+    @Override
+    public AbstractPiece clone() {
+        try {
+            return (AbstractPiece) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError(); // 不会发生
+        }
+    }
 }

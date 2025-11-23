@@ -19,7 +19,7 @@ import java.util.Stack;
  * 负责管理棋盘状态、棋子位置、回合控制、胜负判定以及移动历史记录。
  * 使用 JavaFX 可观察集合和属性，以便视图层自动更新。
  */
-public class ChessBoardModel {
+public class ChessBoardModel implements Cloneable{
     public static final int ROWS = 10;
     public static final int COLS = 9;
 
@@ -383,9 +383,16 @@ public class ChessBoardModel {
     }
 
     /**
+     * 获取最后一步移动记录。
+     */
+    public MoveRecord getLastMove() {
+        return moveHistory.isEmpty() ? null : moveHistory.peek();
+    }
+
+    /**
      * 移动记录类（用于悔棋）。
      */
-    private record MoveRecord(
+    public record MoveRecord(
             AbstractPiece movedPiece,
             int fromRow,
             int fromCol,
@@ -461,5 +468,37 @@ public class ChessBoardModel {
             grid[p.getRow()][p.getCol()] = p;
         }
         return grid;
+    }
+
+        @Override
+    public ChessBoardModel clone() {
+        ChessBoardModel cloned;
+        try {
+            cloned = (ChessBoardModel) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError("Cloning not supported", e);
+        }
+        // 深拷贝棋子列表
+        ObservableList<AbstractPiece> clonedPieces = FXCollections.observableArrayList(piece -> new Observable[]{
+            piece.rowProperty(), piece.colProperty()
+        });
+        for (AbstractPiece piece : this.pieces) {
+            clonedPieces.add(piece.clone());
+        }
+        cloned.pieces.clear();
+        cloned.pieces.addAll(clonedPieces);
+
+        // 重置其他属性
+        cloned.redTurn.set(this.redTurn.get());
+        cloned.specialMessage.set(this.specialMessage.get());
+        cloned.specialMessageFromRed.set(this.specialMessageFromRed.get());
+        cloned.captureHighlight.set(null);
+        cloned.lastCaptureEvent.set(null);
+        cloned.winner.set(this.winner.get());
+        // 克隆时保留历史记录，以便 AI 返回的最佳状态中包含导致该状态的那一步移动
+        cloned.moveHistory.clear();
+        cloned.moveHistory.addAll(this.moveHistory);
+
+        return cloned;
     }
 }

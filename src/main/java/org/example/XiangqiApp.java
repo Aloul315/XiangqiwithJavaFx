@@ -10,6 +10,8 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import org.example.AI.MinMaxSearch;
+import org.example.model.AbstractPiece;
 import org.example.data.AccountService;
 import org.example.data.DatabaseManager;
 import org.example.data.GameStateStore;
@@ -43,6 +45,8 @@ public class XiangqiApp extends Application {
     private DatabaseManager databaseManager;
     private AccountService accountService;
     private GameStateStore gameStateStore;
+    private MinMaxSearch ai; // AI 搜索引擎
+    private boolean isAiMode = false; // 当前是否为人机对战模式
 
     /**
      * 应用程序启动入口。
@@ -70,7 +74,7 @@ public class XiangqiApp extends Application {
         modeHolder[0] = new ModeSelectionView(
             () -> enterHumanVsHuman(stage, boardScene, view, board, modeHolder[0], null),
             (slot) -> enterHumanVsHuman(stage, boardScene, view, board, modeHolder[0], slot),
-            () -> modeHolder[0].showMessage("人机对战模式即将上线，敬请期待！"),
+            () -> enterHumanVsAi(stage, boardScene, view, board, modeHolder[0]),
             this::handleProfileUpdate,
             () -> handleLogout(stage, loginSceneRef[0], loginHolder[0], board, modeHolder[0]),
             request -> handleAccountDeletion(request, stage, loginSceneRef[0], loginHolder[0], preferences, board, modeHolder[0]),
@@ -84,6 +88,13 @@ public class XiangqiApp extends Application {
         board.winnerProperty().addListener((obs, oldWinner, newWinner) -> {
             // 自动删除逻辑可能需要针对多存档进行重新审视。
             // 目前，为了保留历史记录，我们在获胜时不自动删除存档。
+        });
+        
+        board.redTurnProperty().addListener((obs, oldVal, newVal) -> {
+            if (isAiMode && !newVal && board.getWinner() == null) {
+                // AI's turn (Black)
+                makeAiMove(board);
+            }
         });
 
         // 初始化登录视图及其回调
@@ -210,6 +221,7 @@ public class XiangqiApp extends Application {
                                    ChessBoardModel board,
                                    ModeSelectionView modeSelectionView,
                                    Integer slot) {
+        isAiMode = false;
         boolean restored = false;
         if (slot != null && currentAccount != null && gameStateStore != null) {
             try {
@@ -234,6 +246,48 @@ public class XiangqiApp extends Application {
         String titleName = currentProfile != null ? currentProfile.nickname() : "真人对战";
         stage.setTitle("中国象棋演示 - " + titleName);
         modeSelectionView.showMessage(null);
+    }
+
+    /**
+     * 进入人机对战模式。
+     */
+    private void enterHumanVsAi(Stage stage,
+                                Scene boardScene,
+                                ChessBoardView view,
+                                ChessBoardModel board,
+                                ModeSelectionView modeSelectionView) {
+        isAiMode = true;
+        ai = new MinMaxSearch(false, board); // AI plays Black
+        board.restartGame();
+        board.setSpecialMessage("人机对战开始！", true);
+        
+        stage.setScene(boardScene);
+        String titleName = currentProfile != null ? currentProfile.nickname() : "人机对战";
+        stage.setTitle("中国象棋演示 - " + titleName + " (VS AI)");
+        modeSelectionView.showMessage(null);
+    }
+
+    private void makeAiMove(ChessBoardModel board) {
+        new Thread(() -> {
+            try {
+                Thread.sleep(500); // Small delay for better UX
+            } catch (InterruptedException e) {
+                return;
+            }
+            
+            ChessBoardModel bestState = ai.findBestMove(board);
+            if (bestState != null) {
+                ChessBoardModel.MoveRecord move = bestState.getLastMove();
+                if (move != null) {
+                    javafx.application.Platform.runLater(() -> {
+                        AbstractPiece piece = board.getPieceAt(move.fromRow(), move.fromCol());
+                        if (piece != null) {
+                            board.movePiece(piece, move.toRow(), move.toCol());
+                        }
+                    });
+                }
+            }
+        }).start();
     }
 
     /**
