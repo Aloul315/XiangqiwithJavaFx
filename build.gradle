@@ -8,13 +8,12 @@ repositories {
 }
 
 java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
-    }
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 ext {
-    javafxVersion = '21.0.1'
+    javafxVersion = '17.0.10'
     def os = org.gradle.internal.os.OperatingSystem.current()
     javafxPlatform = os.isWindows() ? 'win' : (os.isMacOsX() ? 'mac' : 'linux')
 }
@@ -33,7 +32,7 @@ javafx {
 }
 
 application {
-    mainClass = 'org.example.XiangqiApp'
+    mainClass = 'org.example.Launcher'
 }
 
 tasks.withType(Test).configureEach {
@@ -51,4 +50,37 @@ tasks.register('syncJavafxLibs', Sync) {
 
 tasks.named('run').configure {
     dependsOn(tasks.named('syncJavafxLibs'))
+}
+
+tasks.register('packageWithJdk', Copy) {
+    group = 'distribution'
+    description = 'Bundles the application with the current JDK.'
+
+    dependsOn tasks.named('installDist')
+
+    def jdkHome = System.getProperty("java.home")
+    def installDir = layout.buildDirectory.dir("install/XiangqiwithJavaFX")
+    def outputDir = layout.buildDirectory.dir("distribution/XiangqiGame")
+
+    from(installDir) {
+        into "."
+    }
+
+    from(jdkHome) {
+        into "runtime"
+        // Exclude unnecessary files to reduce size
+        exclude "lib/src.zip", "demo/**", "man/**", "legal/**", "jmods/**"
+    }
+
+    into outputDir
+
+    doLast {
+        def batFile = new File(outputDir.get().asFile, "StartGame.bat")
+        batFile.text = """@echo off
+set "DIR=%~dp0"
+set "JAVA_HOME=%DIR%runtime"
+set "PATH=%JAVA_HOME%\\bin;%PATH%"
+call "%DIR%bin\\\\XiangqiwithJavaFX.bat"
+"""
+    }
 }

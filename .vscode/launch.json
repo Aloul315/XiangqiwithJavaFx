@@ -3,6 +3,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Launcher",
+            "request": "launch",
+            "mainClass": "org.example.Launcher",
+            "projectName": "XiangqiwithJavaFX"
+        },
+        {
+            "type": "java",
             "request": "launch",
             "name": "Launch XiangqiApp (JavaFX)",
             "mainClass": "org.example.XiangqiApp",
